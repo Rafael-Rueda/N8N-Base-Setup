@@ -1,0 +1,7 @@
+# 1. Comece a partir da imagem oficial do ngrok
+FROM ngrok/ngrok:latest
+
+# 2. Instalar curl - ngrok usa uma imagem distroless/minimalista
+# Vamos tentar com apt-get (Debian/Ubuntu based)
+USER root
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*

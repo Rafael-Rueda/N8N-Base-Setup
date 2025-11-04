@@ -1,0 +1,10 @@
+# Variáveis de ambiente - NUNCA commitar!
+.env
+
+# Dados dos containers
+n8n-data/
+postgres-data/
+redis-data/
+
+# Logs
+*.log
