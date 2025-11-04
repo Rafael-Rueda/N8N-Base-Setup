@@ -11,6 +11,14 @@ services:
       - ./n8n-entrypoint.sh:/usr/local/bin/n8n-entrypoint.sh:ro
       - ngrok_url_volume:/ngrok-data
     entrypoint: ["/bin/sh", "/usr/local/bin/n8n-entrypoint.sh"]
+    depends_on:
+      ngrok:
+        condition: service_healthy
+        restart: true
+      postgresql:
+        condition: service_started
+      redis:
+        condition: service_started
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - TZ=America/Sao_Paulo
@@ -28,9 +36,6 @@ services:
       - QUEUE_BULL_REDIS_HOST=redis
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
-    depends_on:
-      - postgresql
-      - redis
     networks:
       - n8n-network
 
@@ -44,6 +49,7 @@ services:
       - 5679:5678
     volumes:
       - ./n8n-data:/home/node/.n8n
+      - ngrok_url_volume:/ngrok-data
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - TZ=America/Sao_Paulo
@@ -62,8 +68,13 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
     depends_on:
-      - postgresql
-      - redis
+      ngrok:
+        condition: service_healthy
+        restart: true
+      postgresql:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - n8n-network
 
@@ -77,6 +88,7 @@ services:
       - 5680:5678
     volumes:
       - ./n8n-data:/home/node/.n8n
+      - ngrok_url_volume:/ngrok-data
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - TZ=America/Sao_Paulo
@@ -95,8 +107,13 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
     depends_on:
-      - postgresql
-      - redis
+      ngrok:
+        condition: service_healthy
+        restart: true
+      postgresql:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - n8n-network
   
@@ -133,7 +150,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ngrok
-    restart: always
+    restart: unless-stopped
     ports:
       - 4040:4040
     volumes:
@@ -143,6 +160,12 @@ services:
     entrypoint: ["/bin/sh", "/usr/local/bin/ngrok-entrypoint.sh"]
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    healthcheck:
+      test: ["CMD", "sh", "-c", "[ -f /ngrok-data/ngrok_url.txt ] && curl -f http://localhost:4040/api/tunnels || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     networks:
       - n8n-network
 

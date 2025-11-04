@@ -14,14 +14,15 @@ done
 # Lê a URL do arquivo
 export NGROK_URL=$(cat $URL_FILE)
 
-echo "----------------------------------------"
+echo "========================================="
 echo "URL pública do Ngrok: $NGROK_URL"
-echo "----------------------------------------"
+echo "========================================="
 
 # Configura as variáveis de ambiente que o n8n precisa
 export N8N_HOST=$NGROK_URL
+export WEBHOOK_URL=$NGROK_URL
 export WEBHOOK_TUNNEL_URL=$NGROK_URL
 
 # Executa o comando padrão do n8n (que é 'n8n start')
-echo "Iniciando n8n..."
+echo "Iniciando n8n com URL: $NGROK_URL"
 exec n8n
