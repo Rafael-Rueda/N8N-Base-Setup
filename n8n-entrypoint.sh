@@ -22,7 +22,9 @@ echo "========================================="
 export N8N_HOST=$NGROK_URL
 export WEBHOOK_URL=$NGROK_URL
 export WEBHOOK_TUNNEL_URL=$NGROK_URL
+export N8N_EDITOR_BASE_URL=$NGROK_URL
+export VUE_APP_URL_BASE_API=$NGROK_URL
 
 # Executa o comando padrão do n8n (que é 'n8n start')
 echo "Iniciando n8n com URL: $NGROK_URL"
-exec n8n
+exec n8n "$@"

@@ -2,7 +2,7 @@ services:
   n8n:
     env_file:
       - .env
-    image: n8nio/n8n:1.119.0
+    image: n8nio/n8n:1.122.4
     restart: always
     ports:
       - 5678:5678
@@ -36,19 +36,22 @@ services:
       - QUEUE_BULL_REDIS_HOST=redis
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      - N8N_ALLOWED_ENV_VAR_NAMES=WEBHOOK_URL,N8N_EDITOR_BASE_URL
     networks:
       - n8n-network
 
   n8n-worker:
     env_file:
       - .env
-    image: n8nio/n8n:1.119.0
+    image: n8nio/n8n:1.122.4
     restart: always
     command: worker
+    entrypoint: ["/bin/sh", "/usr/local/bin/n8n-entrypoint.sh"]
     ports:
       - 5679:5678
     volumes:
       - ./n8n-data:/home/node/.n8n
+      - ./n8n-entrypoint.sh:/usr/local/bin/n8n-entrypoint.sh:ro
       - ngrok_url_volume:/ngrok-data
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
@@ -81,13 +84,15 @@ services:
   n8n-webhook:
     env_file:
       - .env
-    image: n8nio/n8n:1.119.0
+    image: n8nio/n8n:1.122.4
     restart: always
     command: webhook
+    entrypoint: ["/bin/sh", "/usr/local/bin/n8n-entrypoint.sh"]
     ports:
       - 5680:5678
     volumes:
       - ./n8n-data:/home/node/.n8n
+      - ./n8n-entrypoint.sh:/usr/local/bin/n8n-entrypoint.sh:ro
       - ngrok_url_volume:/ngrok-data
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
